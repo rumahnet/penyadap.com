@@ -11,6 +11,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       role: UserRole;
+      emailVerified?: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -45,6 +46,9 @@ export const {
         if (token.email) {
           session.user.email = token.email;
         }
+        if (token.emailVerified !== undefined) {
+          session.user.emailVerified = token.emailVerified as boolean;
+        }
 
         if (token.role) {
           session.user.role = token.role;
@@ -68,6 +72,8 @@ export const {
       token.email = dbUser.email;
       token.picture = dbUser.image;
       token.role = dbUser.role;
+      // expose whether the user's email is verified as a boolean on the token
+      token.emailVerified = !!dbUser.emailVerified;
 
       return token;
     },
