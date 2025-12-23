@@ -53,6 +53,22 @@ export type SubscriptionPlan = {
     monthly: number;
     yearly: number;
   };
+  // Optional Stripe IDs kept for compatibility; can be null when Stripe is unused
+  stripeIds?: {
+    monthly?: string | null;
+    yearly?: string | null;
+  };
+};
+
+// Runtime shape for a user's subscription (optional fields for flexibility)
+export type UserSubscriptionPlan = {
+  title?: string;
+  description?: string;
+  stripeCustomerId?: string | null;
+  isPaid?: boolean;
+  isCanceled?: boolean;
+  stripeCurrentPeriodEnd?: string | Date | null;
+  interval?: "month" | "year" | "monthly" | "yearly" | string;
 };
 
 // compare plans

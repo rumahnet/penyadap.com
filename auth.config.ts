@@ -1,6 +1,5 @@
 import Credentials from "next-auth/providers/credentials";
 import Resend from "next-auth/providers/resend";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 import { env } from "@/env.mjs";
@@ -25,7 +24,9 @@ export default {
           const user = await getUserByEmail(email);
           if (!user || !user.password) return null;
 
-          const passwordsMatch = await bcrypt.compare(password, user.password);
+          // Lazy import bcrypt to prevent Node-only APIs being loaded in Edge runtime
+          const { compare } = await import("bcryptjs");
+          const passwordsMatch = await compare(password, user.password);
 
           if (passwordsMatch) return user;
         }
@@ -34,4 +35,4 @@ export default {
       },
     }),
   ],
-} satisfies NextAuthConfig;
+} satisfies unknown;

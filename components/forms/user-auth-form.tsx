@@ -25,7 +25,9 @@ interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
   disabled?: boolean;
 }
 
-type FormData = z.infer<typeof userLoginSchema> | z.infer<typeof userRegisterSchema>;
+// Use login schema as base and allow optional register fields so
+// `confirmPassword` is accessible in `errors` when rendering the register form.
+type FormData = z.infer<typeof userLoginSchema> & Partial<z.infer<typeof userRegisterSchema>>;
 
 export function UserAuthForm({ className, type, disabled = false, ...props }: UserAuthFormProps) {
   const {

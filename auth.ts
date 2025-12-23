@@ -1,4 +1,5 @@
 import authConfig from "@/auth.config";
+import { env } from "@/env.mjs";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { UserRole } from "@prisma/client";
 import NextAuth, { type DefaultSession } from "next-auth";
@@ -6,15 +7,8 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import { prisma } from "@/lib/db";
 import { getUserById } from "@/lib/user";
 
-// More info: https://authjs.dev/getting-started/typescript#module-augmentation
-declare module "next-auth" {
-  interface Session {
-    user: {
-      role: UserRole;
-      emailVerified?: boolean;
-    } & DefaultSession["user"];
-  }
-}
+// Note: session/user types are declared in `types/next-auth.d.ts`.
+// Avoid duplicating module augmentation here to prevent conflicting declarations.
 
 export const {
   handlers: { GET, POST },
@@ -47,7 +41,8 @@ export const {
           session.user.email = token.email;
         }
         if (token.emailVerified !== undefined) {
-          session.user.emailVerified = token.emailVerified as boolean;
+          // `User.emailVerified` is a Date | null in NextAuth types; preserve original shape
+          session.user.emailVerified = token.emailVerified as unknown as Date | null;
         }
 
         if (token.role) {
@@ -72,12 +67,15 @@ export const {
       token.email = dbUser.email;
       token.picture = dbUser.image;
       token.role = dbUser.role;
-      // expose whether the user's email is verified as a boolean on the token
-      token.emailVerified = !!dbUser.emailVerified;
+      // keep the original `emailVerified` value (Date | null) on the token
+      token.emailVerified = dbUser.emailVerified;
 
       return token;
     },
   },
   ...authConfig,
+  // Ensure NextAuth uses the validated secret from `env.mjs` so runtime
+  // behavior is identical in dev and Vercel/production deployments.
+  secret: env.AUTH_SECRET,
   // debug: process.env.NODE_ENV !== "production"
 });
