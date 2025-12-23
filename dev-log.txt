@@ -1,0 +1,10 @@
+
+> saas-starter@0.3.1 dev F:\Nextjs\penyadap.com
+> next dev
+
+ ΓÜá Port 3000 is in use, trying 3001 instead.
+  Γû▓ Next.js 14.2.5
+  - Local:        http://localhost:3001
+  - Environments: .env.local
+
+ Γ£ô Starting...
