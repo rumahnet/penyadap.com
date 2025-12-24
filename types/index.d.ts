@@ -43,33 +43,12 @@ export type DocsConfig = {
   sidebarNav: SidebarNavItem[];
 };
 
-// subcriptions
-export type SubscriptionPlan = {
-  title: string;
-  description: string;
-  benefits: string[];
-  limitations: string[];
-  prices: {
-    monthly: number;
-    yearly: number;
-  };
-  // Optional Stripe IDs kept for compatibility; can be null when Stripe is unused
-  stripeIds?: {
-    monthly?: string | null;
-    yearly?: string | null;
-  };
-};
+// Subscriptions removed — types kept out to avoid accidental re-use.
+// If you need billing later, re-introduce types here with provider-specific fields.
 
-// Runtime shape for a user's subscription (optional fields for flexibility)
-export type UserSubscriptionPlan = {
-  title?: string;
-  description?: string;
-  stripeCustomerId?: string | null;
-  isPaid?: boolean;
-  isCanceled?: boolean;
-  stripeCurrentPeriodEnd?: string | Date | null;
-  interval?: "month" | "year" | "monthly" | "yearly" | string;
-};
+// (Removed) export type SubscriptionPlan = { /* removed */ };
+// (Removed) export type UserSubscriptionPlan = { /* removed */ };
+
 
 // compare plans
 export type ColumnType = string | boolean | null;

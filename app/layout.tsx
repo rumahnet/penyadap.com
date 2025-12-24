@@ -1,8 +1,8 @@
 import "@/styles/globals.css";
 
 import { fontGeist, fontHeading, fontSans, fontUrban } from "@/assets/fonts";
-import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
+import { SupabaseProvider } from "@/components/providers/supabase-provider";
 
 import { cn, constructMetadata } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           fontGeist.variable,
         )}
       >
-        <SessionProvider>
+        <SupabaseProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <Toaster richColors closeButton />
             <TailwindIndicator />
           </ThemeProvider>
-        </SessionProvider>
+        </SupabaseProvider>
       </body>
     </html>
   );

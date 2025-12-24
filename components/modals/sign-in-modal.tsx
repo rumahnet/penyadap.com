@@ -1,4 +1,4 @@
-import { signIn } from "next-auth/react";
+import { signIn } from "@/lib/auth-adapter";
 import {
   Dispatch,
   SetStateAction,
@@ -32,28 +32,7 @@ function SignInModal({
     setIsLoading(true);
 
     try {
-      console.log("Testing auth with test endpoint first");
-      // First test the endpoint
-      const testRes = await fetch("/api/test-auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.toLowerCase(), password }),
-      });
-
-      const testData = await testRes.json();
-      console.log("Test endpoint response:", { status: testRes.status, data: testData });
-
-      if (!testRes.ok) {
-        toast.error("Invalid credentials (test)", {
-          description: testData.error || "Email or password is incorrect.",
-        });
-        setIsLoading(false);
-        setPassword("");
-        return;
-      }
-
-      console.log("Test auth passed! Now trying NextAuth credentials provider...");
-
+      // Directly sign in with Supabase (no test endpoint). This works in both local and production.
       const result = await signIn("credentials", {
         email: email.toLowerCase(),
         password: password,
@@ -67,9 +46,8 @@ function SignInModal({
         console.log("Sign in failed:", {
           ok: result?.ok,
           error: result?.error,
-          status: result?.status,
         });
-        toast.error("NextAuth failed", {
+        toast.error("Sign in failed", {
           description: `Error: ${result?.error || "Unknown error"}`,
         });
         setIsLoading(false);

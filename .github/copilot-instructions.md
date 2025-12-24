@@ -3,8 +3,8 @@
 Short, targeted orientation for working in this repository so an AI agent can be immediately productive.
 
 ## Quick overview
-- Tech: Next.js (app router, RSC), TypeScript, Prisma (Postgres/Neon), Auth.js (NextAuth v5), Stripe, Resend + React Email, Tailwind, Shadcn UI.
-- Core folders: `app/` (routes + API), `components/` (UI by feature), `actions/` (server actions), `lib/` (db, stripe, helpers), `prisma/` (schema + migrations), `emails/` (React Email templates).
+- Tech: Next.js (app router, RSC), TypeScript, Prisma (Postgres/Neon), Auth.js (NextAuth v5), Resend + React Email, Tailwind, Shadcn UI.
+- Core folders: `app/` (routes + API), `components/` (UI by feature), `actions/` (server actions), `lib/` (db, helpers), `prisma/` (schema + migrations), `emails/` (React Email templates).
 
 ## Essential commands
 - Install & generate: `pnpm install` (runs `prisma generate` via postinstall)
@@ -24,7 +24,7 @@ Short, targeted orientation for working in this repository so an AI agent can be
 - Authentication: NextAuth configured in `auth.ts` plus `auth.config.ts`. Type augmentation for sessions/users is centralized in `types/next-auth.d.ts` — avoid duplicating or contradicting those declarations in other files.
 - DB: `lib/db.ts` exports a globally cached Prisma client. Prisma models live in `prisma/schema.prisma` and migrations in `prisma/migrations/`.
 - Server actions: long-running or side-effecting backend work is implemented as server actions in `actions/` (called from client components via `startTransition`). See `components/forms/billing-form-button.tsx` for an example.
-- Stripe: `lib/stripe.ts` is the client; checkout/portal helpers live in `actions/`; webhook handler is `app/api/webhooks/stripe/route.ts` and MUST verify signatures with `STRIPE_WEBHOOK_SECRET`.
+- Stripe: This project no longer includes an active Stripe integration. If you re-add billing, consider adding `lib/stripe.ts`, checkout/portal helpers, and a webhook handler at `app/api/webhooks/stripe/route.ts` to verify signatures with `STRIPE_WEBHOOK_SECRET`.
 - Emails: React Email templates are in `emails/` and are previewed with `pnpm run email`; sending uses Resend in `lib/email.ts`.
 
 ## Type & module-augmentation guidance (practical rules)

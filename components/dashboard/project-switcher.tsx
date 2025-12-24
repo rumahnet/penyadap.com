@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-adapter";
 
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";

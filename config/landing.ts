@@ -103,7 +103,7 @@ export const testimonials: TestimonialType[] = [
     job: "Full Stack Developer",
     image: "https://randomuser.me/api/portraits/men/1.jpg",
     review:
-      "The next-saas-stripe-starter repo has truly revolutionized my development workflow. With its comprehensive features and seamless integration with Stripe, I've been able to build and deploy projects faster than ever before. The documentation is clear and concise, making it easy to navigate through the setup process. I highly recommend next-saas-stripe-starter to any developer.",
+      "The SaaS Starter repo has truly revolutionized my development workflow. With its comprehensive features and clear documentation, I've been able to build and deploy projects faster than ever before. I highly recommend this starter to any developer.",
   },
   {
     name: "Alice Smith",
@@ -117,7 +117,7 @@ export const testimonials: TestimonialType[] = [
     job: "DevOps Engineer",
     image: "https://randomuser.me/api/portraits/men/3.jpg",
     review:
-      "Thanks to next-saas-stripe-starter, I was able to streamline the entire process and get payments up and running in no time. ",
+      "Thanks to the SaaS Starter, I was able to streamline the entire process and get my project up and running quickly. ",
   },
   {
     name: "Michael Wilson",
@@ -138,7 +138,7 @@ export const testimonials: TestimonialType[] = [
     job: "Marketing Manager",
     image: "https://randomuser.me/api/portraits/women/4.jpg",
     review:
-      "next-saas-stripe-starter has been an invaluable asset in my role as a marketing manager. With its seamless integration with Stripe, I've been able to launch targeted marketing campaigns with built-in payment functionality, allowing us to monetize our products and services more effectively.",
+      "this starter has been an invaluable asset in my role as a marketing manager. I've been able to launch targeted marketing campaigns quickly and focus on monetization strategies using my preferred tools.",
   },
   {
     name: "Jason Stan",

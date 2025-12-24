@@ -36,14 +36,14 @@ export default function RegisterPage() {
             </p>
           </div>
           
-          <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 dark:border-orange-900 dark:bg-orange-950">
-            <p className="text-xs text-orange-900 dark:text-orange-100">
-              <span className="font-semibold">⚠️ Notice:</span> Registration is currently disabled. Use Google Sign In instead.
+          <div className="rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-900 dark:bg-green-950">
+            <p className="text-xs text-green-900 dark:text-green-100">
+              <span className="font-semibold">✓ Info:</span> A verification email will be sent after registration.
             </p>
           </div>
 
           <Suspense>
-            <UserAuthForm type="register" disabled={true} />
+            <UserAuthForm type="register" />
           </Suspense>
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{" "}

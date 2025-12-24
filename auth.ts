@@ -1,10 +1,7 @@
 import authConfig from "@/auth.config";
 import { env } from "@/env.mjs";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { UserRole } from "@prisma/client";
 import NextAuth, { type DefaultSession } from "next-auth";
 
-import { prisma } from "@/lib/db";
 import { getUserById } from "@/lib/user";
 
 // Note: session/user types are declared in `types/next-auth.d.ts`.
@@ -14,7 +11,6 @@ export const {
   handlers: { GET, POST },
   auth,
 } = NextAuth({
-  adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   trustHost: true,
   pages: {

@@ -1,6 +1,6 @@
 <a href="https://next-saas-stripe-starter.vercel.app">
   <img alt="SaaS Starter" src="public/_static/og.jpg">
-  <h1 align="center">Next SaaS Stripe Starter</h1>
+  <h1 align="center">Next SaaS Starter</h1>
 </a>
 
 <p align="center">
@@ -24,7 +24,7 @@
 
 ## Introduction
 
-Empower your next project with the stack of Next.js 14, Prisma, Neon, Auth.js v5, Resend, React Email, Shadcn/ui, and Stripe.
+Empower your next project with the stack of Next.js 14, Prisma, Neon, Auth.js v5, Resend, React Email, and Shadcn/ui.
 <br/>
 All seamlessly integrated with the SaaS Starter to accelerate your development and saas journey.
 
@@ -67,7 +67,7 @@ pnpm run dev
 
 ## Roadmap
 - [ ] Upgrade eslint to v9
-- [ ] Add resend for success subscriptions
+- [ ] (optional) Add subscription support if you need paid plans
 
 ## Tech Stack + Features
 

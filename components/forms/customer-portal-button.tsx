@@ -1,53 +1,26 @@
 "use client";
 
 import * as React from "react";
-import { toast } from "sonner";
+import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { siteConfig } from "@/config/site";
 
 interface CustomerPortalButtonProps {
-  userStripeId: string;
+  userStripeId?: string | null;
 }
 
 export function CustomerPortalButton({ userStripeId }: CustomerPortalButtonProps) {
-  const [loading, setLoading] = React.useState(false);
-
-  async function handleOpenPortal() {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/stripe/portal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customerId: userStripeId }),
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Failed to open customer portal");
-      }
-
-      const data = await res.json();
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("No portal URL returned");
-      }
-    } catch (err: any) {
-      console.error(err);
-      toast.error("Unable to open customer portal");
-    } finally {
-      setLoading(false);
-    }
-  }
+  // Subscriptions have been removed; provide a way for users to contact support.
+  const supportEmail = siteConfig?.mailSupport ?? "support@saas-starter.com";
 
   return (
-    <button
-      type="button"
+    <Link
+      href={`mailto:${supportEmail}`}
       className={buttonVariants()}
-      onClick={handleOpenPortal}
-      disabled={loading || !userStripeId}
+      aria-disabled={!supportEmail}
     >
-      {loading ? "Opening..." : "Manage billing"}
-    </button>
+      Contact support
+    </Link>
   );
 }
 

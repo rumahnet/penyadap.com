@@ -3,8 +3,6 @@ import Resend from "next-auth/providers/resend";
 import { z } from "zod";
 
 import { env } from "@/env.mjs";
-import { prisma } from "@/lib/db";
-import { getUserByEmail } from "@/lib/user";
 
 export default {
   providers: [
@@ -18,20 +16,27 @@ export default {
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);
 
-        if (parsedCredentials.success) {
-          const { email, password } = parsedCredentials.data;
-          // No dev shortcuts — authenticate only against DB users
-          const user = await getUserByEmail(email);
-          if (!user || !user.password) return null;
+        if (!parsedCredentials.success) return null;
 
-          // Lazy import bcrypt to prevent Node-only APIs being loaded in Edge runtime
-          const { compare } = await import("bcryptjs");
-          const passwordsMatch = await compare(password, user.password);
+        const { email, password } = parsedCredentials.data;
 
-          if (passwordsMatch) return user;
-        }
+        // delegate authentication to Supabase (lazy import to avoid bundling in middleware)
+        const { createClient } = await import("@supabase/supabase-js");
+        const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY ?? "");
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.toLowerCase(),
+          password,
+        } as any);
 
-        return null;
+        if (error || !data?.user) return null;
+
+        const user = data.user;
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.user_metadata?.name ?? null,
+          emailVerified: (user.email_confirmed_at ?? user.confirmed_at) ?? null,
+        } as any;
       },
     }),
   ],

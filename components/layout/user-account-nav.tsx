@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { LayoutDashboard, Lock, LogOut, Settings } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "@/lib/auth-adapter";
 import { Drawer } from "vaul";
 
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -100,9 +100,8 @@ export function UserAccountNav() {
                 className="rounded-lg text-foreground hover:bg-muted"
                 onClick={(event) => {
                   event.preventDefault();
-                  signOut({
-                    callbackUrl: `${window.location.origin}/`,
-                  });
+                  // Use Supabase signOut and reload/redirect.
+                  signOut();
                 }}
               >
                 <div className="flex w-full items-center gap-3 px-2.5 py-2">
@@ -160,9 +159,8 @@ export function UserAccountNav() {
           className="cursor-pointer"
           onSelect={(event) => {
             event.preventDefault();
-            signOut({
-              callbackUrl: `${window.location.origin}/`,
-            });
+            // Use Supabase signOut and reload/redirect.
+            signOut();
           }}
         >
           <div className="flex items-center space-x-2.5">

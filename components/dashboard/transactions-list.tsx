@@ -92,7 +92,7 @@ export default function TransactionsList() {
                 </div>
               </TableCell>
               <TableCell className="hidden xl:table-column">
-                Subscription
+                Recurring
               </TableCell>
               <TableCell className="hidden xl:table-column">
                 <Badge className="text-xs" variant="outline">

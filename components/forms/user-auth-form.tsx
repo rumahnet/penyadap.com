@@ -3,8 +3,8 @@
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
+import { useSupabaseAuth } from "@/components/providers/supabase-provider";
 import * as z from "zod";
 
 import { cn } from "@/lib/utils";
@@ -40,6 +40,9 @@ export function UserAuthForm({ className, type, disabled = false, ...props }: Us
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
   const searchParams = useSearchParams();
+  const supabase = useSupabaseAuth();
+
+  const callbackUrl = (searchParams?.get("from") as string) || "/dashboard";
 
   async function onSubmit(data: FormData) {
     setIsLoading(true);
@@ -62,33 +65,36 @@ export function UserAuthForm({ className, type, disabled = false, ...props }: Us
       return toast.success("Account created!", { description: "You can now sign in with your email and password." });
     }
 
-    // Login flow: use credentials (email + password)
-    const callbackUrl = (searchParams?.get("from") as string) || "/dashboard";
+    // Login flow: use server-side auth proxy so cookies are set for SSR
     const { email, password } = data as any;
-    
-    const signInResult = await signIn("credentials", {
-      email: email.toLowerCase(),
-      password: password,
-      redirect: false,
-      callbackUrl: callbackUrl,
-    });
 
-    setIsLoading(false);
-
-    if (!signInResult?.ok || signInResult?.error) {
-      return toast.error("Invalid credentials", {
-        description: "Email or password is incorrect. Please try again.",
+    try {
+      const res = await fetch(`/api/auth`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.toLowerCase(), password }),
+        credentials: "include",
       });
-    }
 
-    // Redirect to callback URL after successful login
-    if (signInResult?.url) {
-      window.location.href = signInResult.url;
-    }
+      setIsLoading(false);
 
-    return toast.success("Logged in!", {
-      description: "Redirecting to " + (callbackUrl === "/dashboard" ? "dashboard" : "previous page") + "...",
-    });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        return toast.error("Invalid credentials", {
+          description: err?.error ?? "Email or password is incorrect. Please try again.",
+        });
+      }
+
+      // Successful login: server should have set cookies; redirect to callback URL
+      window.location.href = callbackUrl;
+
+      return toast.success("Logged in!", {
+        description: "Redirecting to " + (callbackUrl === "/dashboard" ? "dashboard" : "previous page") + "...",
+      });
+    } catch (err: any) {
+      setIsLoading(false);
+      return toast.error("Sign in failed", { description: err?.message ?? "Please try again." });
+    }
   }
 
   return (
@@ -174,9 +180,10 @@ export function UserAuthForm({ className, type, disabled = false, ...props }: Us
       <button
         type="button"
         className={cn(buttonVariants({ variant: "outline" }))}
-        onClick={() => {
-          setIsGoogleLoading(true);
-          signIn("google");
+        onClick={async () => {
+              setIsGoogleLoading(true);
+          const redirectTo = callbackUrl.startsWith("http") ? callbackUrl : window.location.origin + callbackUrl;
+          await supabase.signInWithGoogle(redirectTo);
         }}
         disabled={isLoading || isGoogleLoading || disabled}
       >

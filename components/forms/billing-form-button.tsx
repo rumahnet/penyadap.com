@@ -3,23 +3,18 @@
 import * as React from "react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
-import { SubscriptionPlan } from "@/types";
-import { UserSubscriptionPlan } from "@/types";
+import { siteConfig } from "@/config/site";
 
 interface BillingFormButtonProps {
-  year?: boolean;
-  offer: SubscriptionPlan;
-  subscriptionPlan?: UserSubscriptionPlan;
+  // Dummy props kept for compatibility; billing is removed.
 }
 
-export function BillingFormButton({ offer }: BillingFormButtonProps) {
-  // Minimal placeholder: navigate to pricing page. Integrate real billing flow later.
+export function BillingFormButton(_: BillingFormButtonProps) {
+  const supportEmail = siteConfig?.mailSupport ?? "support@saas-starter.com";
+
   return (
-    <Link
-      href="/pricing"
-      className={buttonVariants({ rounded: "full" })}
-    >
-      Choose plan
+    <Link href={`mailto:${supportEmail}`} className={buttonVariants({ rounded: "full" })}>
+      Contact support
     </Link>
   );
 }

@@ -27,34 +27,6 @@ In `site.ts`, manage metadata and footer links effortlessly.
 
 ### Subscriptions
 
-`subscriptions.ts` holds all necessary data for configuring pricing cards.
-
-Here's the structure for a pricing card:
-
-```js
-{
-  title: 'Pro',
-  description: 'Unlock Advanced Features',
-  benefits: [
-    'Up to 500 monthly posts',
-    'Advanced analytics and reporting',
-    'Access to business templates',
-    'Priority customer support',
-    'Exclusive webinars and training.',
-  ],
-  limitations: [
-    'No custom branding',
-    'Limited access to business resources.',
-  ],
-  prices: {
-    monthly: 15,
-    yearly: 144,
-  },
-  stripeIds: {
-    monthly: env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PLAN_ID,
-    yearly: env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PLAN_ID,
-  },
-},
-```
+Subscriptions and billing have been removed from this starter. If you plan to add paid tiers later, create a config file and document its structure here.
 
 </Steps>

@@ -51,7 +51,7 @@ export default async function HeroLanding() {
           style={{ animationDelay: "0.35s", animationFillMode: "forwards" }}
         >
           Build your next project using Next.js 14, Prisma, Neon, Auth.js v5,
-          Resend, React Email, Shadcn/ui, Stripe.
+          Resend, React Email, and Shadcn/ui.
         </p>
 
         <div
@@ -59,14 +59,14 @@ export default async function HeroLanding() {
           style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}
         >
           <Link
-            href="/pricing"
+            href="/"
             prefetch={true}
             className={cn(
               buttonVariants({ size: "lg", rounded: "full" }),
               "gap-2",
             )}
           >
-            <span>Go Pricing</span>
+            <span>Get started</span>
             <Icons.arrowRight className="size-4" />
           </Link>
           <Link

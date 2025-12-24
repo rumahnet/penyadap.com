@@ -49,3 +49,52 @@ export const sendVerificationRequest: EmailConfig["sendVerificationRequest"] =
       throw new Error("Failed to send verification email.");
     }
   };
+
+/**
+ * Send a verification email for user registration using Supabase's email confirmation.
+ * In development, sends to "delivered@resend.dev" for testing.
+ */
+export async function sendVerificationEmail({
+  email,
+  userId,
+  mailType,
+}: {
+  email: string;
+  userId: string;
+  mailType: "register" | "login";
+}) {
+  // Build the confirmation link using Supabase's email confirmation callback
+  const confirmUrl = new URL(env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
+  confirmUrl.pathname = "/auth/confirm";
+  confirmUrl.searchParams.set("token_hash", `verification-token-placeholder`);
+  confirmUrl.searchParams.set("type", "email");
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: env.EMAIL_FROM || "onboarding@resend.dev",
+      to: process.env.NODE_ENV === "development" ? "delivered@resend.dev" : email,
+      subject:
+        mailType === "register"
+          ? `Verify your email for ${siteConfig.name}`
+          : `Sign in to ${siteConfig.name}`,
+      react: MagicLinkEmail({
+        firstName: email.split("@")[0],
+        actionUrl: confirmUrl.toString(),
+        mailType,
+        siteName: siteConfig.name,
+      }),
+      headers: {
+        "X-Entity-Ref-ID": new Date().getTime() + "",
+      },
+    });
+
+    if (error || !data) {
+      throw new Error(error?.message || "Failed to send email");
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("sendVerificationEmail error:", error);
+    throw error;
+  }
+}

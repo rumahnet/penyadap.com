@@ -11,6 +11,8 @@ import { LoginRequiredButton } from "@/components/guides/login-required-button";
 
 import "@/styles/mdx.css";
 
+export const dynamic = "force-dynamic";
+
 import { Metadata } from "next";
 
 import { constructMetadata, getBlurDataURL } from "@/lib/utils";

@@ -60,10 +60,7 @@ export const docsConfig: DocsConfig = {
           title: "Markdown files",
           href: "/android/configuration/markdown-files",
         },
-        {
-          title: "Subscriptions",
-          href: "/android/configuration/subscriptions",
-        },
+
       ],
     },
   ],

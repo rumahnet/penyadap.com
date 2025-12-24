@@ -5,7 +5,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "@/lib/auth-adapter";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -34,10 +34,10 @@ function DeleteAccountModal({
       if (res.status === 200) {
         // delay to allow for the route change to complete
         await new Promise((resolve) =>
-          setTimeout(() => {
-            signOut({
-              callbackUrl: `${window.location.origin}/`,
-            });
+          setTimeout(async () => {
+            // Use Supabase signOut (no args) and redirect to home for parity with previous behavior.
+            await signOut();
+            if (typeof window !== "undefined") window.location.href = "/";
             resolve(null);
           }, 500),
         );
