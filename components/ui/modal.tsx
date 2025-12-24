@@ -5,7 +5,6 @@ import { Dispatch, SetStateAction } from "react";
 import { Drawer } from "vaul";
 
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 
@@ -94,9 +93,7 @@ export function Modal({
         )}
       >
         {/* Hidden DialogTitle for accessibility */}
-        <VisuallyHidden asChild>
-          <DialogTitle>Modal</DialogTitle>
-        </VisuallyHidden>
+        <DialogTitle className="sr-only">Modal</DialogTitle>
         {children}
       </DialogContent>
     </Dialog>
