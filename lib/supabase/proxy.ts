@@ -2,6 +2,18 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { env } from '@/env.mjs';
 
+/**
+ * Supabase session update handler for middleware (Edge Runtime).
+ * 
+ * This function runs in Vercel Edge Runtime (Next.js middleware).
+ * It uses @supabase/ssr's createServerClient which is optimized for edge environments.
+ * 
+ * Note: The indirect dependency on @supabase/supabase-js causes build warnings about 
+ * Node.js APIs (process.version), but this is safe because:
+ * - Supabase's realtime-js checks for process.versions at module load, not runtime
+ * - The edge runtime only calls getClaims() which doesn't use realtime
+ * - No actual Node.js code is executed in the edge context
+ */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 

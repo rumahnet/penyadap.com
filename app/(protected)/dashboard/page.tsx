@@ -35,22 +35,22 @@ export default async function DashboardPage() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-medium">{user.email}</p>
+                <p className="font-medium">{user.email || "-"}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Nama</p>
-                <p className="font-medium">{user.name || "-"}</p>
+                <p className="font-medium">{(user.user_metadata?.name as string) || "-"}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Role</p>
-                <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>
-                  {user.role}
+                <Badge variant={(user.user_metadata?.role as string) === "ADMIN" ? "default" : "secondary"}>
+                  {(user.user_metadata?.role as string) || "USER"}
                 </Badge>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Status Email</p>
-                <Badge variant={user.emailVerified ? "default" : "outline"}>
-                  {user.emailVerified ? "Verified" : "Not Verified"}
+                <Badge variant={user.email_confirmed_at ? "default" : "outline"}>
+                  {user.email_confirmed_at ? "Verified" : "Not Verified"}
                 </Badge>
               </div>
             </div>

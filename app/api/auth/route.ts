@@ -3,6 +3,9 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { env } from "@/env.mjs";
 
+// Explicitly set Node.js runtime for this API route (required for server-side Supabase)
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
   const cookieStore = cookies();
   const supabase = createServerClient(
