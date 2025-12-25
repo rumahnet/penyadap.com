@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import { allDocs } from "contentlayer/generated";
 
 export const runtime = "nodejs";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { slug: string[] } }
 ) {
   try {

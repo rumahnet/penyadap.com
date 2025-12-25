@@ -1,9 +1,10 @@
 export const runtime = "nodejs";
 
+import { NextRequest } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 
-export const DELETE = async (req: Request) => {
+export const DELETE = async (req: NextRequest) => {
   const currentUser = await getCurrentUser();
   if (!currentUser) {
     return new Response("Not authenticated", { status: 401 });
