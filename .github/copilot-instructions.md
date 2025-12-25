@@ -3,7 +3,7 @@
 Short, targeted orientation for working in this repository so an AI agent can be immediately productive.
 
 ## Quick overview
-- Tech: Next.js (app router, RSC), TypeScript, Prisma (Postgres/Neon), Auth.js (NextAuth v5), Resend + React Email, Tailwind, Shadcn UI.
+- Tech: Next.js (app router, RSC), TypeScript, Prisma (Postgres/Neon), Supabase (Auth), Resend + React Email, Tailwind, Shadcn UI.
 - Core folders: `app/` (routes + API), `components/` (UI by feature), `actions/` (server actions), `lib/` (db, helpers), `prisma/` (schema + migrations), `emails/` (React Email templates).
 
 ## Essential commands
@@ -21,27 +21,25 @@ Short, targeted orientation for working in this repository so an AI agent can be
 
 ## Architecture & developer patterns (what matters)
 - App router with route groups: protected server pages live under `app/(protected)/`. Middleware and auth gating are wired via `middleware.ts` and `auth.ts`.
-- Authentication: NextAuth configured in `auth.ts` plus `auth.config.ts`. Type augmentation for sessions/users is centralized in `types/next-auth.d.ts` — avoid duplicating or contradicting those declarations in other files.
+- Authentication: Supabase is used for authentication (see `components/providers/supabase-provider.tsx` and `lib/auth-adapter.tsx`).
 - DB: `lib/db.ts` exports a globally cached Prisma client. Prisma models live in `prisma/schema.prisma` and migrations in `prisma/migrations/`.
 - Server actions: long-running or side-effecting backend work is implemented as server actions in `actions/` (called from client components via `startTransition`). See `components/forms/billing-form-button.tsx` for an example.
 - Stripe: This project no longer includes an active Stripe integration. If you re-add billing, consider adding `lib/stripe.ts`, checkout/portal helpers, and a webhook handler at `app/api/webhooks/stripe/route.ts` to verify signatures with `STRIPE_WEBHOOK_SECRET`.
 - Emails: React Email templates are in `emails/` and are previewed with `pnpm run email`; sending uses Resend in `lib/email.ts`.
 
 ## Type & module-augmentation guidance (practical rules)
-- Centralize NextAuth type extensions in `types/next-auth.d.ts`. Do not redefine `Session` or `User` properties elsewhere — duplicated augmentations can produce type conflicts (e.g., `emailVerified` mismatch).
+- Authentication types and runtime behavior should be aligned with Supabase and Prisma models; add any needed types under `types/` (avoid duplicating declarations).
 - If you need to add runtime-only fields to JWT/session objects, prefer adding them to the JWT in `callbacks.jwt` and map them in `callbacks.session` while preserving the expected types (e.g., `User.emailVerified` is `Date | null` by default).
 
 Concrete example from the repo:
-- Type declarations: [types/next-auth.d.ts](types/next-auth.d.ts#L1)
-- Auth handler: [auth.ts](auth.ts#L1)
+- Type declarations: add auth-related types under `types/` and keep Prisma `User` as the source of truth for DB shape.
+- Auth handler: use `lib/auth-adapter.tsx` and `components/providers/supabase-provider.tsx` for auth flows.
 
-When editing `auth.ts`, follow the pattern: read DB `User.emailVerified` (Date|null) from Prisma and propagate that same shape through the JWT/session mapping instead of coercing to boolean; adjust the session shape only via the single source of truth in `types/next-auth.d.ts`.
 
 ## Integrations & external dependencies to watch
 - Stripe: `STRIPE_API_KEY`, `STRIPE_WEBHOOK_SECRET` — webhooks must be verified.
 - Resend: email sending configured via env keys validated in `env.mjs`.
-- NextAuth: uses Prisma adapter (`@auth/prisma-adapter`) and expects the Prisma `User` model in `prisma/schema.prisma`.
-
+- Supabase: authentication and session management use Supabase; Prisma `User` types remain the single source of truth for DB shape.
 ## Common pitfalls & debugging tips
 - Missing env vars: `env.mjs` will throw — check `.env.local` early.
 - Type conflicts: check `types/` for augmentations before adding new `declare module` blocks.

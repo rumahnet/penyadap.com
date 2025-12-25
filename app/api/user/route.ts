@@ -1,15 +1,12 @@
-import { auth } from "@/auth";
+export const runtime = "nodejs";
 
+import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 
-export const DELETE = auth(async (req) => {
-  if (!req.auth) {
-    return new Response("Not authenticated", { status: 401 });
-  }
-
-  const currentUser = req.auth.user;
+export const DELETE = async (req: Request) => {
+  const currentUser = await getCurrentUser();
   if (!currentUser) {
-    return new Response("Invalid user", { status: 401 });
+    return new Response("Not authenticated", { status: 401 });
   }
 
   try {
@@ -23,4 +20,4 @@ export const DELETE = auth(async (req) => {
   }
 
   return new Response("User deleted successfully!", { status: 200 });
-});
+};

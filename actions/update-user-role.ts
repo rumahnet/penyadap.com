@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/auth";
+import { getCurrentUser } from "@/lib/session";
 
 import { prisma } from "@/lib/db";
 import { userRoleSchema } from "@/lib/validations/user";
@@ -12,9 +12,9 @@ export type FormData = {
 
 export async function updateUserRole(userId: string, data: FormData) {
   try {
-    const session = await auth();
+    const user = await getCurrentUser();
 
-    if (!session?.user || session?.user.id !== userId) {
+    if (!user || user.id !== userId) {
       throw new Error("Unauthorized");
     }
 
@@ -36,4 +36,4 @@ export async function updateUserRole(userId: string, data: FormData) {
     // console.log(error)
     return { status: "error" };
   }
-}
+} 

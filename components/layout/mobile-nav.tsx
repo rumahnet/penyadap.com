@@ -111,7 +111,7 @@ export function NavMobile() {
 
         {documentation ? (
           <div className="mt-8 block md:hidden">
-            <DocsSidebarNav setOpen={setOpen} />
+            <DocsSidebarNav setOpen={setOpen} items={[]} />
           </div>
         ) : null}
 

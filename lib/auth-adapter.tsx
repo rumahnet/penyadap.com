@@ -3,7 +3,7 @@
 import { supabaseClient } from "@/lib/supabase-client";
 import { useSupabaseAuth } from "@/components/providers/supabase-provider";
 
-// Hook similar to next-auth's useSession
+// Hook similar to other auth libraries' useSession implementations
 export function useSession() {
   const { session, isLoading } = useSupabaseAuth();
   const status = isLoading ? "loading" : session ? "authenticated" : "unauthenticated";

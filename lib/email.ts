@@ -1,16 +1,16 @@
 import { MagicLinkEmail } from "@/emails/magic-link-email";
-import { EmailConfig } from "next-auth/providers/email";
 import { Resend } from "resend";
 
 import { env } from "@/env.mjs";
 import { siteConfig } from "@/config/site";
 
+type VerificationRequestArgs = { identifier: string; url: string; provider: { from: string } };
+
 import { getUserByEmail } from "./user";
 
 export const resend = new Resend(env.RESEND_API_KEY);
 
-export const sendVerificationRequest: EmailConfig["sendVerificationRequest"] =
-  async ({ identifier, url, provider }) => {
+export const sendVerificationRequest = async ({ identifier, url, provider }: VerificationRequestArgs) => {
     const user = await getUserByEmail(identifier);
     if (!user || !user.name) return;
 

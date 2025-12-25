@@ -19,12 +19,6 @@ Pilih salah satu provider:
 - Setup database PostgreSQL Anda
 - Copy connection string
 
-### 3. **Generate AUTH_SECRET**
-```bash
-# Di terminal lokal Anda
-node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
-```
-Copy hasilnya untuk `AUTH_SECRET` di Vercel environment variables.
 
 ### 4. **Environment Variables di Vercel**
 
@@ -36,7 +30,6 @@ Copy hasilnya untuk `AUTH_SECRET` di Vercel environment variables.
 ```
 NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
 
-AUTH_SECRET=[hasil generate di step 3]
 DATABASE_URL=[connection string PostgreSQL Anda]
 
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
@@ -124,7 +117,7 @@ VALUES (
 
 1. **Health Check**
    ```bash
-   curl https://your-domain.com/api/auth/callback/credentials
+   curl https://your-domain.com/
    ```
 
 2. **Test Login**
@@ -167,7 +160,6 @@ Jika menggunakan Google OAuth:
 
 ## 🔐 Security Checklist
 
-- [ ] AUTH_SECRET sudah di-generate secara random
 - [ ] DATABASE_URL tidak di-commit ke git
 - [ ] API keys (Resend, etc) tersembunyi
 - [ ] HTTPS enabled (automatic di Vercel)

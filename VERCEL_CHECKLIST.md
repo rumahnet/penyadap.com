@@ -30,7 +30,6 @@
 - [ ] Simpan di tempat aman
 
 ### 2. Generate Secrets
-- [ ] Generate AUTH_SECRET: `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`
 - [ ] Simpan nilai tersebut
 
 ### 3. Vercel Project
@@ -43,7 +42,6 @@ Set setiap variable ini di Vercel dashboard:
 
 ```
 ✓ NEXT_PUBLIC_APP_URL = https://your-domain.vercel.app
-✓ AUTH_SECRET = [hasil generate]
 ✓ DATABASE_URL = [PostgreSQL connection string]
 ✓ NEXT_PUBLIC_SUPABASE_URL = [optional]
 ✓ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY = [optional]
@@ -108,9 +106,8 @@ DATABASE_URL="..." node scripts/create-admin.js
 
 ## ⚠️ PENTING SEBELUM PRODUCTION
 
-1. **Ubah AUTH_SECRET**
-   - Jangan gunakan yang temporary
-   - Generate baru: `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`
+1. **Supabase service role key (optional)**
+   - If you use server-side Supabase operations, ensure `SUPABASE_SERVICE_ROLE_KEY` is stored in Vercel environment variables.
 
 2. **Setup Database Backup**
    - Supabase: Auto-backup included
