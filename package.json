@@ -8,9 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "pnpm exec contentlayer build && next build",
-    "prebuild": "pnpm exec contentlayer build",
-    "contentlayer:build": "pnpm exec contentlayer build",
+    "build": "next build",
     "turbo": "next dev --turbo",
     "start": "next start",
     "lint": "next lint",
