@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSelectedLayoutSegment } from "next/navigation";
+import { useSelectedLayoutSegment, usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useSession } from "@/lib/auth-adapter";
 
@@ -19,7 +19,11 @@ export function NavMobile() {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const selectedLayout = useSelectedLayoutSegment();
+  const pathname = usePathname();
   const documentation = selectedLayout === "docs";
+  
+  // Determine platform from pathname
+  const platform = pathname.startsWith("/ios") ? "ios" : pathname.startsWith("/android") ? "android" : null;
 
   const configMap = {
     docs: docsConfig.mainNav,
@@ -109,7 +113,11 @@ export function NavMobile() {
           )}
         </ul>
 
-        {documentation ? (
+        {platform ? (
+          <div className="mt-8 block md:hidden">
+            <DocsSidebarNav setOpen={setOpen} platform={platform as "android" | "ios"} />
+          </div>
+        ) : documentation ? (
           <div className="mt-8 block md:hidden">
             <DocsSidebarNav setOpen={setOpen} />
           </div>

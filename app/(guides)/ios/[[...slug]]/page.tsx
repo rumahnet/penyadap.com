@@ -3,19 +3,16 @@ import { allDocs } from "contentlayer/generated";
 
 import { getCurrentUser } from "@/lib/session";
 import { getTableOfContents } from "@/lib/toc";
-import { Mdx } from "@/components/content/mdx-components";
 import { DocsPageHeader } from "@/components/docs/page-header";
-import { DocsPager } from "@/components/docs/pager";
 import { DashboardTableOfContents } from "@/components/shared/toc";
-import { LoginRequiredButton } from "@/components/guides/login-required-button";
+import { GuideContent } from "@/components/guides/guide-content";
 
 import "@/styles/mdx.css";
 
 export const dynamic = "force-dynamic";
 
-import { Metadata } from "next";
-
-import { constructMetadata, getBlurDataURL } from "@/lib/utils";
+import type { Metadata } from "next";
+import { constructMetadata } from "@/lib/utils";
 
 interface DocPageProps {
   params: {
@@ -65,47 +62,47 @@ export default async function iOSPage({ params }: DocPageProps) {
 
   const toc = await getTableOfContents(doc.body.raw);
 
-  const images = await Promise.all(
-    doc.images.map(async (src: string) => ({
-      src,
-      blurDataURL: await getBlurDataURL(src),
-    })),
-  );
-
   // Check if user is authenticated
   const isAuthenticated = !!user;
+  const slug = params.slug?.join("/") || "";
+
+  // Fake content for unauthenticated users
+  const fakeContent = {
+    title: "Installation Guide",
+    description: "Step-by-step guide to install the application",
+    toc: [],
+  };
 
   return (
     <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
       <div className="mx-auto w-full min-w-0">
         <DocsPageHeader heading={doc.title} text={doc.description} />
         
-        {/* Content Container */}
-        {!isAuthenticated ? (
-          <div className="container flex min-h-screen max-w-screen-2xl items-center justify-center">
-            <div className="space-y-4 text-center">
-              <h3 className="text-lg font-semibold">Login Required</h3>
-              <p className="text-sm text-muted-foreground">
-                Sign in with your credentials to view this content
-              </p>
-              <LoginRequiredButton redirectPath="/login?from=/ios" />
+        {/* Content fetching handled by client component */}
+        <GuideContent
+          slug={slug}
+          isAuthenticated={isAuthenticated}
+          fakeContent={fakeContent}
+          redirectTo="/login?from=/ios"
+        />
+      </div>
+      {isAuthenticated ? (
+        <div className="hidden text-sm xl:block">
+          <div className="sticky top-16 -mt-10 max-h-[calc(var(--vh)-4rem)] overflow-y-auto pt-8">
+            <DashboardTableOfContents toc={toc} />
+          </div>
+        </div>
+      ) : (
+        <div className="hidden text-sm xl:block">
+          <div className="sticky top-16 -mt-10 max-h-[calc(var(--vh)-4rem)] overflow-y-auto pt-8" style={{ filter: "blur(12px)" }}>
+            <div className="space-y-2">
+              <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+              <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
+              <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
             </div>
           </div>
-        ) : (
-          <>
-            <div className="pb-4 pt-11">
-              <Mdx code={doc.body.code} images={images} />
-            </div>
-            <hr className="my-4 md:my-6" />
-            <DocsPager doc={doc} />
-          </>
-        )}
-      </div>
-      <div className="hidden text-sm xl:block">
-        <div className="sticky top-16 -mt-10 max-h-[calc(var(--vh)-4rem)] overflow-y-auto pt-8">
-          <DashboardTableOfContents toc={toc} />
         </div>
-      </div>
+      )}
     </main>
   );
 }

@@ -30,7 +30,8 @@ const defaultComputedFields: ComputedFields = {
 
 export const Doc = defineDocumentType(() => ({
   name: "Doc",
-  filePathPattern: `docs/**/*.mdx`,
+  // Match both top-level `android/` and `ios/` folders and any nested occurrences
+  filePathPattern: `**/{android,ios}/**/*.mdx`,
   contentType: "mdx",
   fields: {
     title: {

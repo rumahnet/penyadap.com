@@ -18,12 +18,20 @@ interface ProtectedLayoutProps {
 export default async function Dashboard({ children }: ProtectedLayoutProps) {
   const user = await getCurrentUser();
 
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
+
+  // Check if user has required fields
+  if (!user.id || !user.email) {
+    console.error("User missing required fields:", { id: user.id, email: user.email });
+    redirect("/login");
+  }
 
   const filteredLinks = sidebarLinks.map((section) => ({
     ...section,
     items: section.items.filter(
-      ({ authorizeOnly }) => !authorizeOnly || authorizeOnly === user.role,
+      ({ authorizeOnly }) => !authorizeOnly || authorizeOnly === (user.user_metadata?.role as string),
     ),
   }));
 

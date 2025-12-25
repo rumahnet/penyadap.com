@@ -7,6 +7,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { UserAuthForm } from "@/components/forms/user-auth-form";
 import { Icons } from "@/components/shared/icons";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Login",
   description: "Login to your account",

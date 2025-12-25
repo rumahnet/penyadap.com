@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Shield, CheckCircle2, AlertCircle } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = constructMetadata({
   title: "Dashboard – SaaS Starter",
   description: "Account information and parental control services.",

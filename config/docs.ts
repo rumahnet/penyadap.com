@@ -13,54 +13,32 @@ export const docsConfig: DocsConfig = {
   ],
   sidebarNav: [
     {
-      title: "Getting Started",
+      title: "Android",
       items: [
         {
-          title: "Introduction",
+          title: "Home",
           href: "/android",
         },
         {
-          title: "Installation",
-          href: "/android/installation",
-        },
-      ],
-    },
-    {
-      title: "Configuration",
-      items: [
-        {
-          title: "Authentification",
-          href: "/android/configuration/authentification",
+          title: "Installation - Tahap 1",
+          href: "/android/installation/tahap-1",
         },
         {
-          title: "Blog",
-          href: "/android/configuration/blog",
+          title: "Installation - Tahap 2",
+          href: "/android/installation/tahap-2",
         },
         {
-          title: "Components",
-          href: "/android/configuration/components",
+          title: "Installation - Tahap 3",
+          href: "/android/installation/tahap-3",
         },
         {
-          title: "Config files",
-          href: "/android/configuration/config-files",
+          title: "Installation - Tahap 4",
+          href: "/android/installation/tahap-4",
         },
         {
-          title: "Database",
-          href: "/android/configuration/database",
+          title: "Installation - Tahap 5",
+          href: "/android/installation/tahap-5",
         },
-        {
-          title: "Email",
-          href: "/android/configuration/email",
-        },
-        {
-          title: "Layouts",
-          href: "/android/configuration/layouts",
-        },
-        {
-          title: "Markdown files",
-          href: "/android/configuration/markdown-files",
-        },
-
       ],
     },
   ],
