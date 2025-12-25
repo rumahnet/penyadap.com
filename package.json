@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "contentlayer build && next build",
+    "prebuild": "contentlayer build",
     "turbo": "next dev --turbo",
     "start": "next start",
     "lint": "next lint",
