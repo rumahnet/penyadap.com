@@ -16,7 +16,7 @@
     "lint": "next lint",
     "preview": "next build && next start",
     "postinstall": "prisma generate",
-    "email": "email dev --dir emails --port 3333"}
+    "email": "email dev --dir emails --port 3333"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
