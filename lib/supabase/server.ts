@@ -4,7 +4,7 @@ import { env } from '@/env.mjs';
 
 // Create a server supabase client that reads/writes cookies via Next's cookie store
 export async function createServerSupabaseClient() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   return createServerClient(
     env.NEXT_PUBLIC_SUPABASE_URL!,
