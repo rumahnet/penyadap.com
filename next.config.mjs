@@ -4,7 +4,6 @@ import "./env.mjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   images: {
     remotePatterns: [
       {
@@ -21,9 +20,10 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    serverComponentsExternalPackages: ["@prisma/client"],
-  },
+  serverExternalPackages: ["@prisma/client"],
+  turbopack: {},
+  // Note: `serverExternalPackages` replaces the old experimental.serverComponentsExternalPackages
+  // and Turbopack is configured explicitly here with an empty object to avoid errors during build.
 };
 
 export default withContentlayer(nextConfig);
