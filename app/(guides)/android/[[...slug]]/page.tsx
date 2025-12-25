@@ -21,7 +21,11 @@ interface DocPageProps {
 }
 
 async function getDocFromParams(params) {
-  const slug = params.slug?.join("/") || "";
+  // In Next 16, `params` can be a Promise and must be awaited before
+  // accessing its properties. Awaiting works whether `params` is a plain
+  // object or a Promise, so this is safe for both legacy and new behavior.
+  const resolved = await params;
+  const slug = resolved?.slug?.join("/") || "";
   const doc = allDocs.find((doc) => doc.slugAsParams === slug);
 
   if (!doc) return null;
@@ -64,7 +68,9 @@ export default async function DocPage({ params }: DocPageProps) {
 
   // Check if user is authenticated
   const isAuthenticated = !!user;
-  const slug = params.slug?.join("/") || "";
+  // params may be a Promise; await it before accessing
+  const resolvedParams = await params;
+  const slug = resolvedParams?.slug?.join("/") || "";
 
   // Fake content for unauthenticated users
   const fakeContent = {

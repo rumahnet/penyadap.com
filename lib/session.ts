@@ -28,14 +28,34 @@ export const getCurrentUser = cache(async () => {
       },
     );
 
+    // If there are no cookies, skip calling Supabase which will return an
+    // "Auth session missing!" error in the common unauthenticated case.
+    const allCookies = cookieStore.getAll();
+    const hasSupabaseCookie = allCookies.some((c) =>
+      // common Supabase cookie names / prefixes
+      c.name.includes("sb-") ||
+      c.name.includes("supabase") ||
+      c.name.includes("auth") ||
+      c.name.includes("session")
+    );
+
+    if (!hasSupabaseCookie) {
+      return undefined;
+    }
+
     // Preferably use getUser to get the current user associated with cookies
     const { data, error } = await supabase.auth.getUser();
-    
+
+    // Avoid noisy logs for the expected unauthenticated response from the
+    // Supabase client ("Auth session missing!"). Only log unexpected errors.
     if (error) {
+      if (typeof error.message === "string" && error.message.includes("Auth session missing")) {
+        return undefined;
+      }
       console.error("getCurrentUser error:", error.message);
       return undefined;
     }
-    
+
     return data.user ?? undefined;
   } catch (error) {
     console.error("getCurrentUser exception:", error);

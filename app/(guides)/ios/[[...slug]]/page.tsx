@@ -21,7 +21,8 @@ interface DocPageProps {
 }
 
 async function getDocFromParams(params) {
-  const slug = params.slug?.join("/") || "";
+  const resolved = await params;
+  const slug = resolved?.slug?.join("/") || "";
   const doc = allDocs.find((doc) => doc.slugAsParams === slug);
 
   if (!doc) return null;
@@ -64,7 +65,8 @@ export default async function iOSPage({ params }: DocPageProps) {
 
   // Check if user is authenticated
   const isAuthenticated = !!user;
-  const slug = params.slug?.join("/") || "";
+  const resolvedParams = await params;
+  const slug = resolvedParams?.slug?.join("/") || "";
 
   // Fake content for unauthenticated users
   const fakeContent = {
