@@ -20,7 +20,8 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata | undefined> {
-  const page = allPages.find((page) => page.slugAsParams === params.slug);
+  const resolved = await params;
+  const page = allPages.find((page) => page.slugAsParams === resolved.slug);
   if (!page) {
     return;
   }
@@ -40,7 +41,8 @@ export default async function PagePage({
     slug: string;
   };
 }) {
-  const page = allPages.find((page) => page.slugAsParams === params.slug);
+  const resolved = await params;
+  const page = allPages.find((page) => page.slugAsParams === resolved.slug);
 
   if (!page) {
     notFound();

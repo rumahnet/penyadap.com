@@ -27,7 +27,8 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata | undefined> {
-  const guide = allGuides.find((guide) => guide.slugAsParams === params.slug);
+  const resolved = await params;
+  const guide = allGuides.find((guide) => guide.slugAsParams === resolved.slug);
   if (!guide) {
     return;
   }
@@ -47,7 +48,8 @@ export default async function GuidePage({
     slug: string;
   };
 }) {
-  const guide = allGuides.find((guide) => guide.slugAsParams === params.slug);
+  const resolved = await params;
+  const guide = allGuides.find((guide) => guide.slugAsParams === resolved.slug);
 
   if (!guide) {
     notFound();
