@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { slug: string[] } }
+  { params }: { params: Promise<{ slug: string[] }> }
 ) {
   try {
     // 1. Verify Supabase session on backend
@@ -20,7 +20,8 @@ export async function GET(
     }
 
     // 2. Find document from Contentlayer
-    const slug = params.slug?.join("/") || "";
+    const resolved = await params;
+    const slug = resolved.slug?.join("/") || "";
     const doc = allDocs.find((doc) => doc.slugAsParams === slug);
 
     if (!doc) {
