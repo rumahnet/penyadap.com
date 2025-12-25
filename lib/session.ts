@@ -7,7 +7,7 @@ import { env } from "@/env.mjs";
 
 export const getCurrentUser = cache(async () => {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
     const supabase = createServerClient(
       env.NEXT_PUBLIC_SUPABASE_URL!,
