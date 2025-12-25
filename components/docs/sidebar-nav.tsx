@@ -4,55 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { NavItem } from "types";
-import { docsConfig } from "@/config/docs";
 import { cn } from "@/lib/utils";
 
 export interface DocsSidebarNavProps {
   setOpen?: (boolean) => void;
-  platform?: "android" | "ios";
+  items?: Array<{
+    title: string;
+    items: NavItem[];
+  }>;
 }
 
-export function DocsSidebarNav({ setOpen, platform = "android" }: DocsSidebarNavProps) {
+export function DocsSidebarNav({ setOpen, items = [] }: DocsSidebarNavProps) {
   const pathname = usePathname();
-  
-  // Generate sidebar items based on platform
-  const generatePlatformItems = () => {
-    const baseItems: NavItem[] = [
-      {
-        title: "Introduction",
-        href: `/${platform}`,
-      },
-      {
-        title: "Installation - Tahap 1",
-        href: `/${platform}/installation/tahap-1`,
-      },
-      {
-        title: "Installation - Tahap 2",
-        href: `/${platform}/installation/tahap-2`,
-      },
-      {
-        title: "Installation - Tahap 3",
-        href: `/${platform}/installation/tahap-3`,
-      },
-      {
-        title: "Installation - Tahap 4",
-        href: `/${platform}/installation/tahap-4`,
-      },
-      {
-        title: "Installation - Tahap 5",
-        href: `/${platform}/installation/tahap-5`,
-      },
-    ];
-
-    return [
-      {
-        title: platform.charAt(0).toUpperCase() + platform.slice(1),
-        items: baseItems,
-      },
-    ];
-  };
-
-  const items = generatePlatformItems();
 
   return items.length > 0 ? (
     <div className="w-full">
