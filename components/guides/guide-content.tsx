@@ -46,10 +46,29 @@ export function GuideContent({
     // Fetch real content from API
     const fetchContent = async () => {
       try {
-        const response = await fetch(`/api/guides/${slug}`);
+        // Guard against empty slug (prevents requesting `/api/guides` without a slug)
+        if (!slug) {
+          console.error("GuideContent: missing slug, aborting fetch");
+          setError("Invalid guide slug");
+          setLoading(false);
+          return;
+        }
+
+        const url = `/api/guides/${encodeURIComponent(slug)}`;
+        console.debug("GuideContent fetching:", { slug, url });
+
+        const response = await fetch(url);
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.statusText}`);
+          let errBody = null;
+          try {
+            errBody = await response.json();
+          } catch (e) {
+            /* ignore */
+          }
+
+          const errMsg = `Failed to fetch: ${response.statusText}${errBody ? ` - ${JSON.stringify(errBody)}` : ""}`;
+          throw new Error(errMsg);
         }
 
         const data = await response.json();

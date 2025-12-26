@@ -16,7 +16,26 @@ const defaultComputedFields: ComputedFields = {
   },
   slugAsParams: {
     type: "string",
-    resolve: (doc) => doc._raw.flattenedPath.split("/").slice(1).join("/"),
+    resolve: (doc) => {
+      let fp = String(doc._raw?.flattenedPath || "");
+
+      // Remove leading 'content/' if present
+      if (fp.startsWith("content/")) {
+        fp = fp.replace(/^content\//, "");
+      }
+
+      // If this is the root index (e.g., 'index'), return empty string
+      if (fp === "index") {
+        return "";
+      }
+
+      // Remove trailing '/index' if present (so 'android/index' -> 'android')
+      if (fp.endsWith("/index")) {
+        fp = fp.slice(0, -"/index".length);
+      }
+
+      return fp;
+    },
   },
   images: {
     type: "list",

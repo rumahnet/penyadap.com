@@ -23,7 +23,50 @@ interface DocPageProps {
 async function getDocFromParams(params) {
   const resolved = await params;
   const slug = resolved?.slug?.join("/") || "";
-  const doc = allDocs.find((doc) => doc.slugAsParams === slug);
+
+  // Base directory for this page (since the route lives in /ios)
+  const base = "ios";
+
+  // Try to find the doc by slug; allow fallbacks for index files and flattened path variants
+  let doc = allDocs.find((doc) => doc.slugAsParams === slug);
+
+  // Debug: list candidate docs to diagnose why wrong doc may be selected
+  try {
+    // eslint-disable-next-line no-console
+    console.debug("iOS getDocFromParams: candidates", {
+      slug,
+      base,
+      candidates: allDocs.map((d) => ({ slugAsParams: d.slugAsParams, flattenedPath: d._raw?.flattenedPath }))
+    });
+  } catch (e) {
+    /* ignore */
+  }
+
+  if (!doc) {
+    // When slug is empty, first prefer a doc whose slugAsParams equals the base
+    if (!slug) {
+      doc = allDocs.find((d) => d.slugAsParams === base);
+    }
+
+    if (!doc) {
+      doc = allDocs.find((d) => {
+        const fp = String(d._raw?.flattenedPath || "");
+
+        // When slug is empty (visiting /ios), prefer a doc whose flattenedPath equals base
+        if (!slug) {
+          return fp === base || fp === `${base}/index`;
+        }
+
+        // Match exact flattened path, trailing '/index', or ending with the slug segment
+        return (
+          fp === slug ||
+          fp === `${slug}/index` ||
+          fp.endsWith(`/${slug}`) ||
+          fp.endsWith(`/${slug}/index`)
+        );
+      });
+    }
+  }
 
   if (!doc) return null;
 
@@ -75,6 +118,17 @@ export default async function iOSPage({ params }: DocPageProps) {
     toc: [],
   };
 
+  // Compute final slug to pass to the client component
+  const finalSlug = doc.slugAsParams || String(doc._raw?.flattenedPath || "").replace(/\/index$/, "");
+
+  // Debug: log the resolved slug and document slug for diagnosis
+  try {
+    // eslint-disable-next-line no-console
+    console.debug("iOS DocPage debug:", { resolvedSlug: slug, docSlug: doc?.slugAsParams, finalSlug, docFlattenedPath: doc?._raw?.flattenedPath });
+  } catch (e) {
+    /* ignore */
+  }
+
   return (
     <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
       <div className="mx-auto w-full min-w-0">
@@ -82,7 +136,7 @@ export default async function iOSPage({ params }: DocPageProps) {
         
         {/* Content fetching handled by client component */}
         <GuideContent
-          slug={slug}
+          slug={finalSlug}
           isAuthenticated={isAuthenticated}
           fakeContent={fakeContent}
           redirectTo="/login?from=/ios"

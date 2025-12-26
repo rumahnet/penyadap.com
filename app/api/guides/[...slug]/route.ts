@@ -22,11 +22,27 @@ export async function GET(
     // 2. Find document from Contentlayer
     const resolved = await params;
     const slug = resolved.slug?.join("/") || "";
-    const doc = allDocs.find((doc) => doc.slugAsParams === slug);
+    // Attempt to find the document by slug; include fallbacks for index and flattened path patterns
+    let doc = allDocs.find((doc) => doc.slugAsParams === slug);
 
     if (!doc) {
+      doc = allDocs.find((d) => {
+        const fp = String(d._raw?.flattenedPath || "");
+
+        return (
+          fp === slug ||
+          fp === `${slug}/index` ||
+          fp.endsWith(`/${slug}`) ||
+          fp.endsWith(`/${slug}/index`)
+        );
+      });
+    }
+
+    if (!doc) {
+      console.error(`Guide not found for slug: "${slug}". Available slugs:`, allDocs.map((d) => d.slugAsParams));
+      console.error(`Docs flattened paths:`, allDocs.map((d) => ({ slugAsParams: d.slugAsParams, flattenedPath: d._raw?.flattenedPath })));
       return NextResponse.json(
-        { error: "Not found" },
+        { error: `Not found: ${slug}`, available: allDocs.map((d) => d.slugAsParams), flattened: allDocs.map((d) => ({ slugAsParams: d.slugAsParams, flattenedPath: d._raw?.flattenedPath })) },
         { status: 404 }
       );
     }
