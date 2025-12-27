@@ -1,7 +1,7 @@
 import { SidebarNavItem, SiteConfig } from "types";
-import { env } from "@/env.mjs";
 
-const site_url = env.NEXT_PUBLIC_APP_URL;
+// Use process.env for public NEXT_PUBLIC_* values so missing server-only envs don't throw during module import
+const site_url = process.env.NEXT_PUBLIC_APP_URL ?? "https://penyadap.com";
 
 export const siteConfig: SiteConfig = {
   name: "PENYADAP.COM",

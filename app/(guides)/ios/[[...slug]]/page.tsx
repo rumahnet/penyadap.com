@@ -39,7 +39,7 @@ async function getDocFromParams(params) {
       candidates: allDocs.map((d) => ({ slugAsParams: d.slugAsParams, flattenedPath: d._raw?.flattenedPath }))
     });
   } catch (e) {
-    /* ignore */
+    // ignore
   }
 
   if (!doc) {
@@ -126,7 +126,7 @@ export default async function iOSPage({ params }: DocPageProps) {
     // eslint-disable-next-line no-console
     console.debug("iOS DocPage debug:", { resolvedSlug: slug, docSlug: doc?.slugAsParams, finalSlug, docFlattenedPath: doc?._raw?.flattenedPath });
   } catch (e) {
-    /* ignore */
+    // ignore
   }
 
   return (
