@@ -14,7 +14,7 @@
     "start": "next start",
     "lint": "next lint",
     "preview": "next build && next start",
-    "postinstall": "prisma generate",
+    "postinstall": "pnpm exec contentlayer2 build && prisma generate",
     "email": "email dev --dir emails --port 3333"
   },
   "dependencies": {
