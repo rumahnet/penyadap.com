@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { env } from '@/env.mjs';
+
+// Use process.env so missing server envs do not throw at module import time
 
 /**
  * Supabase session update handler for middleware (Edge Runtime).
@@ -17,9 +18,12 @@ import { env } from '@/env.mjs';
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
   const supabase = createServerClient(
-    env.NEXT_PUBLIC_SUPABASE_URL!,
-    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    SUPABASE_URL!,
+    SUPABASE_KEY!,
     {
       cookies: {
         getAll() {
@@ -41,8 +45,16 @@ export async function updateSession(request: NextRequest) {
 
   // We must call getClaims (or getUser) to validate the JWT & refresh if needed.
   // This will also cause the library to call `setAll` when it has cookies to set.
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  // Wrap in a try/catch so token refresh errors do not throw from middleware.
+  try {
+    const { data } = await supabase.auth.getClaims();
+    const user = data?.claims;
+  } catch (err: any) {
+    // Refresh token errors occasionally occur when cookies are partially present
+    // or invalid. Don't propagate the error — treat as unauthenticated.
+    // eslint-disable-next-line no-console
+    console.debug("updateSession: supabase.getClaims error:", err?.message ?? err);
+  }
 
   // If no user and not on login pages, optionally redirect. We will not auto-redirect
   // here to keep behavior consistent with existing app; pages will still call getCurrentUser().

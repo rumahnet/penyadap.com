@@ -7,7 +7,7 @@
     "url": "https://twitter.com/mickasmt"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "pnpm exec contentlayer2 build && next dev",
     "build": "pnpm exec contentlayer2 build && next build",
     "contentlayer:build": "pnpm exec contentlayer2 build",
     "turbo": "next dev --turbo",

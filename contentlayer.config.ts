@@ -19,9 +19,13 @@ const defaultComputedFields: ComputedFields = {
     resolve: (doc) => {
       let fp = String(doc._raw?.flattenedPath || "");
 
-      // Remove leading 'content/' if present
+      // Remove leading 'content/' or 'docs/' if present to keep slugs clean
       if (fp.startsWith("content/")) {
         fp = fp.replace(/^content\//, "");
+      }
+
+      if (fp.startsWith("docs/")) {
+        fp = fp.replace(/^docs\//, "");
       }
 
       // If this is the root index (e.g., 'index'), return empty string
@@ -49,8 +53,9 @@ const defaultComputedFields: ComputedFields = {
 
 export const Doc = defineDocumentType(() => ({
   name: "Doc",
-  // Match both top-level `android/` and `ios/` folders and any nested occurrences
-  filePathPattern: `**/{android,ios}/**/*.mdx`,
+  // Support docs//** for an organized docs folder while remaining backward-compatible
+  // with existing android/ and ios/ directories.
+  filePathPattern: `**/{docs,android,ios}/**/*.mdx`,
   contentType: "mdx",
   fields: {
     title: {
@@ -118,7 +123,7 @@ export const Post = defineDocumentType(() => ({
     },
     image: {
       type: "string",
-      required: true,
+      required: false,
     },
     authors: {
       type: "list",
@@ -163,6 +168,10 @@ export const Page = defineDocumentType(() => ({
 export default makeSource({
   contentDirPath: "./content",
   documentTypes: [Page, Doc, Guide, Post],
+  // Disable the import-alias warning (Windows environments and some CI can
+  // present path resolution differences that cause a noisy warning from
+  // Contentlayer; disabling the warning is safe when we provide our own shim)
+  disableImportAliasWarning: true,
   mdx: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [

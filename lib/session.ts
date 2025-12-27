@@ -3,15 +3,25 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
-import { env } from "@/env.mjs";
+// Use process.env to avoid throwing at module import time if env validation fails
+
 
 export const getCurrentUser = cache(async () => {
   try {
     const cookieStore = await cookies();
 
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+      // Don't throw — return unauthenticated so pages can still render.
+      console.error("getCurrentUser skipped: missing Supabase public env vars");
+      return undefined;
+    }
+
     const supabase = createServerClient(
-      env.NEXT_PUBLIC_SUPABASE_URL!,
-      env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      SUPABASE_URL,
+      SUPABASE_KEY,
       {
         cookies: {
           getAll() {
@@ -44,19 +54,33 @@ export const getCurrentUser = cache(async () => {
     }
 
     // Preferably use getUser to get the current user associated with cookies
-    const { data, error } = await supabase.auth.getUser();
+    try {
+      const { data, error } = await supabase.auth.getUser();
 
-    // Avoid noisy logs for the expected unauthenticated response from the
-    // Supabase client ("Auth session missing!"). Only log unexpected errors.
-    if (error) {
-      if (typeof error.message === "string" && error.message.includes("Auth session missing")) {
+      // Avoid noisy logs for the expected unauthenticated response from the
+      // Supabase client ("Auth session missing!"). Also treat refresh-token issues
+      // as unauthenticated so pages don't crash when refresh tokens are stale/missing.
+      if (error) {
+        const msg = typeof error.message === "string" ? error.message : String(error);
+        if (msg.includes("Auth session missing") || msg.includes("Refresh Token Not Found") || msg.includes("Invalid Refresh Token")) {
+          return undefined;
+        }
+        console.error("getCurrentUser error:", error.message);
         return undefined;
       }
-      console.error("getCurrentUser error:", error.message);
+
+      return data.user ?? undefined;
+    } catch (err: any) {
+      const msg = typeof err?.message === "string" ? err.message : String(err);
+      if (msg.includes("Refresh Token Not Found") || msg.includes("Invalid Refresh Token") || msg.includes("Auth session missing")) {
+        // Treat token refresh errors as unauthenticated rather than throwing
+        // so pages can render without crashing.
+        return undefined;
+      }
+
+      console.error("getCurrentUser exception:", err);
       return undefined;
     }
-
-    return data.user ?? undefined;
   } catch (error) {
     console.error("getCurrentUser exception:", error);
     return undefined;

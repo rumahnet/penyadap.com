@@ -85,9 +85,18 @@ export async function generateMetadata({
 export async function generateStaticParams(): Promise<
   DocPageProps["params"][]
 > {
-  return allDocs.map((doc) => ({
-    slug: doc.slugAsParams.split("/"),
-  }));
+  const base = "android";
+  return allDocs
+    .filter((doc) => String(doc._raw?.flattenedPath || "").startsWith(base))
+    .map((doc) => {
+      const fp = String(doc._raw?.flattenedPath || "");
+      // If this doc is the base index (android/index or android), yield an empty slug
+      if (fp === base || fp === `${base}/index` || doc.slugAsParams === base) {
+        return { slug: [] };
+      }
+
+      return { slug: doc.slugAsParams.split("/") };
+    });
 }
 
 export default async function DocPage({ params }: DocPageProps) {
