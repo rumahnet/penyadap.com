@@ -1,17 +1,51 @@
 import fs from "fs";
 import path from "path";
 
-const genIndex = path.resolve(process.cwd(), ".contentlayer", "generated", "index.mjs");
+// Find `.contentlayer/generated/index.mjs` by walking up parent folders so the
+// shim still works if the server is started from another CWD (e.g. `dist`)
+function findGeneratedIndex(startDir = process.cwd()) {
+  let dir = startDir;
+  const root = path.parse(dir).root;
+  while (true) {
+    const candidate = path.join(dir, ".contentlayer", "generated", "index.mjs");
+    if (fs.existsSync(candidate)) return candidate;
+    if (dir === root) break;
+    dir = path.dirname(dir);
+  }
+
+  // Fallback: try relative to this file location (handles some bundled cases)
+  try {
+    const altCandidate = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..", ".contentlayer", "generated", "index.mjs");
+    if (fs.existsSync(altCandidate)) return altCandidate;
+  } catch (e) {
+    // ignore
+  }
+
+  return null;
+}
+
 let generated = null;
 
 async function loadGenerated() {
-  if (!generated && fs.existsSync(genIndex)) {
-    // Import the ESM-generated module dynamically
-    try {
-      generated = await import(`file://${genIndex}`);
-    } catch (err) {
-      // ignore
-      generated = null;
+  if (!generated) {
+    const genIndex = findGeneratedIndex();
+    const exists = !!genIndex;
+
+    // Debug: show where we looked and what we found
+    // eslint-disable-next-line no-console
+    console.debug(`[contentlayer] loadGenerated: cwd=${process.cwd()} genIndex=${genIndex} exists=${exists}`);
+
+    if (exists) {
+      // Import the ESM-generated module dynamically
+      try {
+        generated = await import(`file://${genIndex}`);
+        // eslint-disable-next-line no-console
+        console.debug(`[contentlayer] loadGenerated: imported generated module keys=${Object.keys(generated).join(',')}`);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.debug(`[contentlayer] loadGenerated: import failed: ${err && err.message}`);
+        generated = null;
+      }
     }
   }
   return generated;
