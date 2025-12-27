@@ -19,13 +19,17 @@ const defaultComputedFields: ComputedFields = {
     resolve: (doc) => {
       let fp = String(doc._raw?.flattenedPath || "");
 
-      // Remove leading 'content/' or 'docs/' if present to keep slugs clean
+      // Remove leading 'content/', 'docs/', or 'blog/' if present to keep slugs clean
       if (fp.startsWith("content/")) {
         fp = fp.replace(/^content\//, "");
       }
 
       if (fp.startsWith("docs/")) {
         fp = fp.replace(/^docs\//, "");
+      }
+
+      if (fp.startsWith("blog/")) {
+        fp = fp.replace(/^blog\//, "");
       }
 
       // If this is the root index (e.g., 'index'), return empty string
