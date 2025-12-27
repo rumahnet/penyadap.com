@@ -1,0 +1,46 @@
+name: Contentlayer + Next Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          node-version: '20'
+          pnpm-version: '8'
+
+      - name: Node / pnpm info
+        run: |
+          node -v
+          pnpm -v
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Contentlayer build
+        run: pnpm exec contentlayer2 build --clearCache
+
+      - name: Run Next.js build
+        run: pnpm run build
+
+      - name: Upload build artifacts (for debugging)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build-artifacts
+          path: |
+            .next/**
+            .contentlayer/**
