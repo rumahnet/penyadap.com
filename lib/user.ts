@@ -1,9 +1,15 @@
-import { env } from "@/env.mjs";
-
 export const getUserByEmail = async (email: string) => {
   try {
+    const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    if (!SERVICE_ROLE || !SUPABASE_URL) {
+      console.error("getUserByEmail skipped: missing Supabase service role or URL");
+      return null;
+    }
+
     const { createClient } = await import("@supabase/supabase-js");
-    const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY ?? "");
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
     // Supabase admin does not expose a typed getUserByEmail in all versions; list users and match by email
     const res = await supabase.auth.admin.listUsers();
@@ -25,8 +31,16 @@ export const getUserByEmail = async (email: string) => {
 
 export const getUserById = async (id: string) => {
   try {
+    const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    if (!SERVICE_ROLE || !SUPABASE_URL) {
+      console.error("getUserById skipped: missing Supabase service role or URL");
+      return null;
+    }
+
     const { createClient } = await import("@supabase/supabase-js");
-    const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY ?? "");
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
 
     const { data, error } = await supabase.auth.admin.getUserById(id);
     if (error || !data) return null;

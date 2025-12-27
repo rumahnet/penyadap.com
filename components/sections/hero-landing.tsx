@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { env } from "@/env.mjs";
 import { siteConfig } from "@/config/site";
 import { cn, nFormatter } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -10,7 +9,7 @@ export default async function HeroLanding() {
   const { stargazers_count: stars } = await fetch(
     "https://api.github.com/repos/mickasmt/next-saas-stripe-starter",
     {
-      ...(env.GITHUB_OAUTH_TOKEN && {
+      ...(process.env.GITHUB_OAUTH_TOKEN && {
         headers: {
           Authorization: `Bearer ${process.env.GITHUB_OAUTH_TOKEN}`,
           "Content-Type": "application/json",

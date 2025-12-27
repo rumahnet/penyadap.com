@@ -91,9 +91,18 @@ export async function generateMetadata({
 export async function generateStaticParams(): Promise<
   DocPageProps["params"][]
 > {
-  return allDocs.map((doc) => ({
-    slug: doc.slugAsParams.split("/"),
-  }));
+  const base = "ios";
+  return allDocs
+    .filter((doc) => String(doc._raw?.flattenedPath || "").startsWith(base))
+    .map((doc) => {
+      const fp = String(doc._raw?.flattenedPath || "");
+      // If this doc is the base index (ios/index or ios), yield an empty slug
+      if (fp === base || fp === `${base}/index` || doc.slugAsParams === base) {
+        return { slug: [] };
+      }
+
+      return { slug: doc.slugAsParams.split("/") };
+    });
 }
 
 export default async function iOSPage({ params }: DocPageProps) {

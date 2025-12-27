@@ -3,15 +3,25 @@ import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
-import { env } from "@/env.mjs";
+// Use process.env to avoid throwing at module import time if env validation fails
+
 
 export const getCurrentUser = cache(async () => {
   try {
     const cookieStore = await cookies();
 
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+      // Don't throw — return unauthenticated so pages can still render.
+      console.error("getCurrentUser skipped: missing Supabase public env vars");
+      return undefined;
+    }
+
     const supabase = createServerClient(
-      env.NEXT_PUBLIC_SUPABASE_URL!,
-      env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      SUPABASE_URL,
+      SUPABASE_KEY,
       {
         cookies: {
           getAll() {

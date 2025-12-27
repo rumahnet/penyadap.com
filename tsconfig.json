@@ -24,7 +24,8 @@
         "./*"
       ],
       "contentlayer/generated": [
-        "./contentlayer/generated"
+        "./contentlayer/generated",
+        ".contentlayer/generated"
       ]
     },
     "plugins": [
@@ -47,6 +48,7 @@
   "exclude": [
     "node_modules",
     ".next/dev",
-    ".next"
+    ".next",
+    "next-saas-stripe-starter"
   ]
 }

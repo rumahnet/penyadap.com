@@ -1,7 +1,6 @@
 "use server";
 
 import { userRegisterSchema } from "@/lib/validations/auth";
-import { env } from "@/env.mjs";
 
 export type FormData = {
   email: string;
@@ -14,14 +13,17 @@ export async function registerUser(data: FormData) {
     const parsed = userRegisterSchema.parse(data);
 
     // Ensure service role key is set (required for admin user creation)
-    if (!env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.error("registerUser error: SUPABASE_SERVICE_ROLE_KEY is not set");
-      return { status: "error", message: "Server misconfigured: SUPABASE_SERVICE_ROLE_KEY missing" } as const;
+    const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    if (!SERVICE_ROLE || !SUPABASE_URL) {
+      console.error("registerUser error: SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL is not set");
+      return { status: "error", message: "Server misconfigured: missing Supabase service role or URL" } as const;
     }
 
     // create user using Supabase Admin API (lazy import)
     const { createClient } = await import("@supabase/supabase-js");
-    const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
     
     // Always auto-confirm emails for testing (will remove this later for production)
     const autoConfirmEmail = true;

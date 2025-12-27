@@ -1,14 +1,20 @@
 import { MagicLinkEmail } from "@/emails/magic-link-email";
 import { Resend } from "resend";
 
-import { env } from "@/env.mjs";
 import { siteConfig } from "@/config/site";
 
 type VerificationRequestArgs = { identifier: string; url: string; provider: { from: string } };
 
 import { getUserByEmail } from "./user";
 
-export const resend = new Resend(env.RESEND_API_KEY);
+export function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("Resend API key missing (RESEND_API_KEY)");
+    return null as unknown as Resend;
+  }
+  return new Resend(apiKey);
+}
 
 export const sendVerificationRequest = async ({ identifier, url, provider }: VerificationRequestArgs) => {
     const user = await getUserByEmail(identifier);
@@ -20,7 +26,10 @@ export const sendVerificationRequest = async ({ identifier, url, provider }: Ver
       : "Activate your account";
 
     try {
-      const { data, error } = await resend.emails.send({
+      const resendClient = getResendClient();
+      if (!resendClient) throw new Error("Resend client not configured");
+
+      const { data, error } = await resendClient.emails.send({
         from: provider.from,
         to:
           process.env.NODE_ENV === "development"
@@ -64,14 +73,17 @@ export async function sendVerificationEmail({
   mailType: "register" | "login";
 }) {
   // Build the confirmation link using Supabase's email confirmation callback
-  const confirmUrl = new URL(env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
+  const confirmUrl = new URL(process.env.NEXT_PUBLIC_APP_URL || siteConfig.url || "http://localhost:3000");
   confirmUrl.pathname = "/auth/confirm";
   confirmUrl.searchParams.set("token_hash", `verification-token-placeholder`);
   confirmUrl.searchParams.set("type", "email");
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: env.EMAIL_FROM || "onboarding@resend.dev",
+    const resendClient = getResendClient();
+    if (!resendClient) throw new Error("Resend client not configured");
+
+    const { data, error } = await resendClient.emails.send({
+      from: process.env.EMAIL_FROM || "onboarding@resend.dev",
       to: process.env.NODE_ENV === "development" ? "delivered@resend.dev" : email,
       subject:
         mailType === "register"
