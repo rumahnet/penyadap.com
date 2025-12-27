@@ -45,8 +45,16 @@ export async function updateSession(request: NextRequest) {
 
   // We must call getClaims (or getUser) to validate the JWT & refresh if needed.
   // This will also cause the library to call `setAll` when it has cookies to set.
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  // Wrap in a try/catch so token refresh errors do not throw from middleware.
+  try {
+    const { data } = await supabase.auth.getClaims();
+    const user = data?.claims;
+  } catch (err: any) {
+    // Refresh token errors occasionally occur when cookies are partially present
+    // or invalid. Don't propagate the error — treat as unauthenticated.
+    // eslint-disable-next-line no-console
+    console.debug("updateSession: supabase.getClaims error:", err?.message ?? err);
+  }
 
   // If no user and not on login pages, optionally redirect. We will not auto-redirect
   // here to keep behavior consistent with existing app; pages will still call getCurrentUser().

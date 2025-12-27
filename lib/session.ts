@@ -54,19 +54,33 @@ export const getCurrentUser = cache(async () => {
     }
 
     // Preferably use getUser to get the current user associated with cookies
-    const { data, error } = await supabase.auth.getUser();
+    try {
+      const { data, error } = await supabase.auth.getUser();
 
-    // Avoid noisy logs for the expected unauthenticated response from the
-    // Supabase client ("Auth session missing!"). Only log unexpected errors.
-    if (error) {
-      if (typeof error.message === "string" && error.message.includes("Auth session missing")) {
+      // Avoid noisy logs for the expected unauthenticated response from the
+      // Supabase client ("Auth session missing!"). Also treat refresh-token issues
+      // as unauthenticated so pages don't crash when refresh tokens are stale/missing.
+      if (error) {
+        const msg = typeof error.message === "string" ? error.message : String(error);
+        if (msg.includes("Auth session missing") || msg.includes("Refresh Token Not Found") || msg.includes("Invalid Refresh Token")) {
+          return undefined;
+        }
+        console.error("getCurrentUser error:", error.message);
         return undefined;
       }
-      console.error("getCurrentUser error:", error.message);
+
+      return data.user ?? undefined;
+    } catch (err: any) {
+      const msg = typeof err?.message === "string" ? err.message : String(err);
+      if (msg.includes("Refresh Token Not Found") || msg.includes("Invalid Refresh Token") || msg.includes("Auth session missing")) {
+        // Treat token refresh errors as unauthenticated rather than throwing
+        // so pages can render without crashing.
+        return undefined;
+      }
+
+      console.error("getCurrentUser exception:", err);
       return undefined;
     }
-
-    return data.user ?? undefined;
   } catch (error) {
     console.error("getCurrentUser exception:", error);
     return undefined;
