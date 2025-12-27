@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { pathToFileURL } from "url";
 
 // Find `.contentlayer/generated/index.mjs` by walking up parent folders so the
 // shim still works if the server is started from another CWD (e.g. `dist`)
@@ -38,7 +39,10 @@ async function loadGenerated() {
     if (exists) {
       // Import the ESM-generated module dynamically
       try {
-        generated = await import(`file://${genIndex}`);
+        const genIndexUrl = pathToFileURL(genIndex).href;
+        // eslint-disable-next-line no-console
+        console.debug(`[contentlayer] loadGenerated: importing generated module url=${genIndexUrl}`);
+        generated = await import(genIndexUrl);
         // eslint-disable-next-line no-console
         console.debug(`[contentlayer] loadGenerated: imported generated module keys=${Object.keys(generated).join(',')}`);
       } catch (err) {
