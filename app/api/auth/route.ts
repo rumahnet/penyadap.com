@@ -10,9 +10,16 @@ import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
+
+  // Validate required Supabase env vars and return a helpful 500 if missing
+  if (!env.NEXT_PUBLIC_SUPABASE_URL || !(env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)) {
+    console.error("Auth route misconfigured: missing NEXT_PUBLIC_SUPABASE_URL or publishable key");
+    return NextResponse.json({ error: "Server misconfigured: missing Supabase environment variables" }, { status: 500 });
+  }
+
   const supabase = createServerClient(
-    env.NEXT_PUBLIC_SUPABASE_URL!,
-    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    env.NEXT_PUBLIC_SUPABASE_URL,
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {

@@ -50,16 +50,16 @@ export function UserAuthForm({ className, type, disabled = false, ...props }: Us
     // Register flow
     if (type === "register") {
       // data should match userRegisterSchema
-      const { status } = await registerUser(data as RegisterForm);
+      const result = await registerUser(data as RegisterForm);
 
       setIsLoading(false);
 
-      if (status === "exists") {
+      if (result?.status === "exists") {
         return toast.error("Account exists", { description: "An account with this email already exists." });
       }
 
-      if (status !== "success") {
-        return toast.error("Something went wrong.", { description: "Your registration failed. Please try again." });
+      if (result?.status !== "success") {
+        return toast.error("Something went wrong.", { description: result?.message ?? "Your registration failed. Please try again." });
       }
 
       return toast.success("Account created!", { description: "You can now sign in with your email and password." });
